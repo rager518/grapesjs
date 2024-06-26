@@ -139,17 +139,17 @@ export default class PropertyFactory {
     ];
     this.optsFonts = [
       'Arial, Helvetica' + ss,
-      'Arial Black, Gadget' + ss,
-      'Brush Script MT' + ss,
-      'Comic Sans MS, cursive' + ss,
-      'Courier New, Courier, monospace',
+      '"Arial Black", Gadget' + ss,
+      '"Brush Script MT"' + ss,
+      '"Comic Sans MS", cursive' + ss,
+      '"Courier New", Courier, monospace',
       'Georgia, serif',
       'Helvetica' + ss,
       'Impact, Charcoal' + ss,
-      'Lucida Sans Unicode, Lucida Grande' + ss,
+      '"Lucida Sans Unicode", "Lucida Grande"' + ss,
       'Tahoma, Geneva' + ss,
-      'Times New Roman, Times, serif',
-      'Trebuchet MS, Helvetica' + ss,
+      '"Times New Roman", Times, serif',
+      '"Trebuchet MS, Helvetica"' + ss,
       'Verdana, Geneva' + ss,
     ].map(font => {
       return { id: font, label: font.split(',')[0] };

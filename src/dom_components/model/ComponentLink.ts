@@ -11,7 +11,25 @@ export default class ComponentLink extends ComponentText {
       ...super.defaults,
       type,
       tagName: 'a',
-      traits: ['title', 'href', 'target'],
+      traits: [
+        'title',
+        'target',
+        {
+          type: 'select',
+          name: 'radius',
+          options: [
+            { id: '', label: '圆角类型' },
+            { id: 'noneRadius', label: 'noneRadius' },
+            { id: 'normalRadius', label: 'normalRadius' },
+            { id: 'traceRadius', label: 'traceRadius' },
+            { id: 'largeRadius', label: 'largeRadius' },
+          ],
+        },
+        {
+          type: 'action',
+          name: 'href',
+        },
+      ],
     };
   }
 

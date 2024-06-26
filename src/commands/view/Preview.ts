@@ -51,6 +51,11 @@ export default {
     if (!this.helper) {
       const helper = document.createElement('span');
       helper.className = `${pfx}off-prv fa fa-eye-slash`;
+
+      const script = document.createElement('script');
+      script.src = 'dist/pre.js';
+      helper.appendChild(script);
+
       editorEl.appendChild(helper);
       helper.onclick = () => this.stopCommand();
       this.helper = helper;
@@ -69,6 +74,22 @@ export default {
     canvasS.margin = '0';
     editor.refresh();
     this.tglEffects(1);
+
+    let urlParams = new URLSearchParams(window.location.search);
+    let devValue = urlParams.get('dev');
+    if (devValue === 'false') {
+      const accessUrl = editor.config.accessUrl;
+      if (accessUrl) {
+        setTimeout(() => {
+          this.stopCommand();
+        }, 1000);
+
+        window.open(accessUrl);
+      } else {
+        console.error('accessUrl未设置');
+      }
+      return;
+    }
   },
 
   stop(editor) {

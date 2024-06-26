@@ -42,7 +42,7 @@ export default class Category extends Model<CategoryProperties> {
     return {
       id: '',
       label: '',
-      open: true,
+      open: false,
       attributes: {},
     };
   }

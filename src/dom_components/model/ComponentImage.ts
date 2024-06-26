@@ -19,7 +19,34 @@ export default class ComponentImage extends Component {
       editable: 1,
       highlightable: 0,
       resizable: { ratioDefault: 1 },
-      traits: ['alt'],
+      traits: [
+        'alt',
+        'src',
+        'data-src',
+        {
+          type: 'select',
+          name: 'radius',
+          options: [
+            { id: '', label: '圆角类型' },
+            { id: 'noneRadius', label: 'noneRadius' },
+            { id: 'normalRadius', label: 'normalRadius' },
+            { id: 'traceRadius', label: 'traceRadius' },
+            { id: 'largeRadius', label: 'largeRadius' },
+          ],
+        },
+        {
+          type: 'checkbox',
+          name: 'notpc',
+        },
+        {
+          type: 'checkbox',
+          name: 'nottablet',
+        },
+        {
+          type: 'checkbox',
+          name: 'notmobile',
+        },
+      ],
 
       src: `<svg ${svgAttrs}>
         <path d="M8.5 13.5l2.5 3 3.5-4.5 4.5 6H5m16 1V5a2 2 0 0 0-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2z"></path>

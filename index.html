@@ -5,6 +5,7 @@
     <title>GrapesJS</title>
     <link rel="stylesheet" href="dist/css/grapes.min.css">
     <script src="grapes.min.js"></script>
+    <script src="https://unpkg.com/grapesjs-blocks-basic"></script>
     <style>
       body,
       html {
@@ -85,6 +86,7 @@
         container: '#gjs',
         height: '100%',
         fromElement: true,
+        plugins:['gjs-blocks-basic'],
         storageManager: { autoload: 0 },
         styleManager : {
           sectors: [{

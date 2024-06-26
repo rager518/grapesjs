@@ -83,7 +83,19 @@ export interface RichTextEditorConfig {
 const config: RichTextEditorConfig = {
   stylePrefix: 'rte-',
   adjustToolbar: true,
-  actions: ['bold', 'italic', 'underline', 'strikethrough', 'link', 'wrap'],
+  actions: [
+    'justifyLeft',
+    'justifyCenter',
+    'justifyRight',
+    'size',
+    'color',
+    'bold',
+    'italic',
+    'underline',
+    'strikethrough',
+    'link',
+    'wrap',
+  ],
   custom: false,
 };
 

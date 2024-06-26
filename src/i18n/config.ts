@@ -1,4 +1,5 @@
 import en from './locale/en';
+import zh from './locale/zh';
 
 export interface I18nConfig {
   /**
@@ -38,11 +39,11 @@ export interface I18nConfig {
 }
 
 const config: I18nConfig = {
-  locale: 'en',
-  localeFallback: 'en',
+  locale: 'zh',
+  localeFallback: 'zh',
   detectLocale: true,
   debug: false,
-  messages: { en },
+  messages: { zh },
   messagesAdd: undefined,
 };
 

@@ -1,9 +1,6 @@
 import { isUndefined } from 'underscore';
-import ColorPicker from '../../utils/ColorPicker';
 import $ from '../../utils/cash-dom';
 import Input from './Input';
-
-$ && ColorPicker($);
 
 const getColor = (color: any) => {
   const name = color.getFormat() === 'name' && color.toName();
@@ -23,7 +20,9 @@ export default class InputColor extends Input {
       <div class="${this.holderClass()}"></div>
       <div class="${ppfx}field-colorp">
         <div class="${ppfx}field-colorp-c" data-colorp-c>
-          <div class="${ppfx}checker-bg"></div>
+          <div class="${ppfx}checker-bg">
+
+          </div>
         </div>
       </div>
     `;
@@ -40,7 +39,6 @@ export default class InputColor extends Input {
 
   remove() {
     super.remove();
-    this.colorEl.spectrum('destroy');
     return this;
   }
 
@@ -59,9 +57,7 @@ export default class InputColor extends Input {
 
     // Check the color by using the ColorPicker's parser
     if (colorEl) {
-      colorEl.spectrum('set', value);
-      const tc = colorEl.spectrum('get');
-      const color = value && getColor(tc);
+      const color = value;
       color && (value = color);
     }
 
@@ -85,7 +81,6 @@ export default class InputColor extends Input {
 
     // This prevents from adding multiple thumbs in spectrum
     if (opts.fromTarget || (opts.fromInput && !opts.avoidStore)) {
-      colorEl.spectrum('set', valueClr);
       this.noneColor = value == 'none';
       this.movedColor = valueClr;
     }
@@ -97,83 +92,9 @@ export default class InputColor extends Input {
    */
   getColorEl() {
     if (!this.colorEl) {
-      const { em, model, opts } = this;
-      const ppfx = this.ppfx;
-      const { onChange } = opts;
-
-      const colorEl = $(`<div class="${this.ppfx}field-color-picker"></div>`);
-      const cpStyle = colorEl.get(0)!.style;
-      const colorPickerConfig = (em && em.getConfig && em.getConfig().colorPicker) || {};
-
+      const colorEl = $(`<div class="${this.ppfx}field-color-picker"><input type='color' value='#ffffff'/></div>`);
       this.movedColor = '';
-      let changed = false;
-      let previousColor: string;
       this.$el.find('[data-colorp-c]').append(colorEl);
-
-      const handleChange = (value: string, complete = true) => {
-        if (onChange) {
-          onChange(value, !complete);
-        } else {
-          complete && model.setValueFromInput(0, false); // for UndoManager
-          model.setValueFromInput(value, complete);
-        }
-      };
-
-      // @ts-ignore
-      colorEl.spectrum({
-        color: model.getValue() || false,
-        containerClassName: `${ppfx}one-bg ${ppfx}two-color ${ppfx}editor-sp`,
-        maxSelectionSize: 8,
-        showPalette: true,
-        showAlpha: true,
-        chooseText: 'Ok',
-        cancelText: '⨯',
-        palette: [],
-
-        // config expanded here so that the functions below are not overridden
-        ...colorPickerConfig,
-        ...(model.get('colorPicker') || {}),
-
-        move: (color: any) => {
-          const cl = getColor(color);
-          this.movedColor = cl;
-          cpStyle.backgroundColor = cl;
-          handleChange(cl, false);
-        },
-        change: (color: any) => {
-          changed = true;
-          const cl = getColor(color);
-          cpStyle.backgroundColor = cl;
-          handleChange(cl);
-          this.noneColor = false;
-        },
-        show: (color: any) => {
-          changed = false;
-          this.movedColor = '';
-          previousColor = onChange ? model.getValue({ noDefault: true }) : getColor(color);
-        },
-        hide: () => {
-          if (!changed && (previousColor || onChange)) {
-            if (this.noneColor) {
-              previousColor = '';
-            }
-            cpStyle.backgroundColor = previousColor;
-            // @ts-ignore
-            colorEl.spectrum('set', previousColor);
-            handleChange(previousColor, false);
-          }
-        },
-      });
-
-      if (em && em.on!) {
-        this.listenTo(em, 'component:selected', () => {
-          this.movedColor && handleChange(this.movedColor);
-          changed = true;
-          this.movedColor = '';
-          // @ts-ignore
-          colorEl.spectrum('hide');
-        });
-      }
 
       this.colorEl = colorEl;
     }

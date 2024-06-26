@@ -76,6 +76,7 @@ import ComponentTableFoot from './model/ComponentTableFoot';
 import ComponentTableHead from './model/ComponentTableHead';
 import ComponentTableRow from './model/ComponentTableRow';
 import ComponentText from './model/ComponentText';
+import ComponentReadonly from './model/ComponentReadonly';
 import ComponentTextNode from './model/ComponentTextNode';
 import ComponentVideo from './model/ComponentVideo';
 import ComponentWrapper from './model/ComponentWrapper';
@@ -101,6 +102,7 @@ import ComponentVideoView from './view/ComponentVideoView';
 import ComponentView, { IComponentView } from './view/ComponentView';
 import ComponentWrapperView from './view/ComponentWrapperView';
 import ComponentsView from './view/ComponentsView';
+import ComponentReadonlyView from './view/ComponentReadonlyView';
 import ComponentHead, { type as typeHead } from './model/ComponentHead';
 import {
   getSymbolMain,
@@ -256,6 +258,11 @@ export default class ComponentManager extends ItemManagerModule<DomComponentsCon
       id: 'comment',
       model: ComponentComment,
       view: ComponentCommentView,
+    },
+    {
+      id: 'readonly',
+      model: ComponentReadonly,
+      view: ComponentReadonlyView,
     },
     {
       id: 'textnode',

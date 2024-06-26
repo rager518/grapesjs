@@ -39,6 +39,8 @@ type EffectOptions = {
 };
 
 const RTE_KEY = '_rte';
+const DEFAULT_FONT_SIZE = '18';
+const DEFAULT_COLOR = '#000000';
 
 const btnState = {
   ACTIVE: 1,
@@ -54,7 +56,165 @@ const isValidTag = (rte: RichTextEditor, tagName = 'A') => {
 
 const customElAttr = 'data-selectme';
 
+const rgbToHex = (colorString: string): string | null => {
+  const rgbRegex: RegExp = /^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/;
+
+  const match: RegExpMatchArray | null = colorString.match(rgbRegex);
+  if (!match) {
+    return colorString;
+  }
+
+  const componentToHex = (c: string): string => {
+    const hex: string = parseInt(c).toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+
+  const hexColor: string = '#' + componentToHex(match[1]) + componentToHex(match[2]) + componentToHex(match[3]);
+  return hexColor.toUpperCase();
+};
+
+const getSelectHtml = (rte: RichTextEditor, fontSize: string, color: string, type: number = 0): string => {
+  let tagName = 'SPAN';
+  if (isValidTag(rte, tagName)) {
+    const { anchorNode, focusNode } = rte.selection() || {};
+    const parentAnchor = anchorNode?.parentNode;
+    const parentFocus = focusNode?.parentNode;
+
+    let span: HTMLSpanElement | null = null;
+
+    if (parentAnchor?.nodeName == tagName) {
+      span = parentAnchor as HTMLSpanElement;
+    } else if (parentFocus?.nodeName == tagName) {
+      span == (parentFocus as HTMLSpanElement);
+    }
+
+    if (span) {
+      const computedStyle = window.getComputedStyle(span);
+      switch (type) {
+        case 1:
+          fontSize = computedStyle.fontSize;
+          break;
+        case 0:
+          color = computedStyle.color;
+          break;
+      }
+    }
+  }
+
+  return `<span style="color:${color}; font-size:${fontSize};">${rte.selection()} </span>`;
+};
+
+const patchAction = (rte: RichTextEditor, size: string, color: string, select: boolean) => {
+  const html = getSelectHtml(rte, size + 'px', color, 0);
+
+  rte.insertHTML(html, {
+    select: select,
+  });
+};
+
+const syncStyle = (rte: RichTextEditor, action: RichTextEditorAction, type: number = 0): number => {
+  if (rte && rte.selection()) {
+    if (action.btn?.firstChild != null && action.btn?.firstChild instanceof HTMLInputElement) {
+      let tagName = 'SPAN';
+      let fontSize = DEFAULT_FONT_SIZE;
+      let color: string | null = DEFAULT_COLOR;
+
+      if (isValidTag(rte, tagName)) {
+        const { anchorNode, focusNode } = rte.selection() || {};
+        const parentAnchor = anchorNode?.parentNode;
+        const parentFocus = focusNode?.parentNode;
+
+        let span: HTMLSpanElement | null = null;
+
+        if (parentAnchor?.nodeName == tagName) {
+          span = parentAnchor as HTMLSpanElement;
+        } else if (parentFocus?.nodeName == tagName) {
+          span == (parentFocus as HTMLSpanElement);
+        }
+
+        if (span) {
+          const computedStyle = window.getComputedStyle(span);
+          fontSize = computedStyle.fontSize.replace('px', '');
+          color = rgbToHex(computedStyle.color);
+        }
+      }
+
+      let val = type === 0 ? fontSize : color;
+
+      if (val) {
+        action.btn.firstChild.value = val;
+      }
+    }
+  }
+
+  return 1;
+};
+
 const defActions: Record<string, RichTextEditorAction> = {
+  size: {
+    name: 'size',
+    icon: '<input name="csize" type="number" min="8" max="72" value="18" style="width:38px"> px',
+    attributes: { title: 'size' },
+    event: 'change',
+    result: function (rte, action) {
+      if (action.btn?.firstChild != null && action.btn?.firstChild instanceof HTMLInputElement) {
+        const faction = rte.actions.find(p => p.name == 'forecolor');
+        let color: string | null = null;
+        if (faction?.btn?.firstChild && faction.btn.firstChild instanceof HTMLInputElement) {
+          color = faction.btn.firstChild.value;
+        }
+
+        patchAction(rte, action.btn.firstChild.value, color ?? DEFAULT_COLOR, false);
+      }
+    },
+    update: (rte, action) => {
+      return syncStyle(rte, action, 0);
+    },
+  },
+  color: {
+    name: 'forecolor',
+    icon: '<input name="cpicker" type="color" ></input>',
+    attributes: { title: 'forecolor' },
+    event: 'input',
+    result: function (rte, action) {
+      if (action.btn?.firstChild != null && action.btn?.firstChild instanceof HTMLInputElement) {
+        const faction = rte.actions.find(p => p.name == 'size');
+        let fsize: string = DEFAULT_FONT_SIZE;
+        if (faction?.btn?.firstChild && faction.btn.firstChild instanceof HTMLInputElement) {
+          fsize = faction.btn.firstChild.value;
+        }
+
+        patchAction(rte, fsize, action.btn.firstChild.value, false);
+      }
+    },
+    update: (rte, action) => {
+      return syncStyle(rte, action, 1);
+    },
+  },
+  justifyLeft: {
+    name: 'justifyLeft',
+    icon: `<svg width="13" height="10" viewBox="0 0 13 10" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" d="M9 8.125V9.375H0.25V8.125H9ZM12.75 5.625V6.875H0.25V5.625H12.75ZM9 3.125V4.375H0.25V3.125H9ZM12.75 0.625V1.875H0.25V0.625H12.75Z" fill="currentColor"></path>
+</svg>`,
+    attributes: { title: 'left' },
+    result: rte => rte.exec('justifyLeft'),
+  },
+  justifyCenter: {
+    name: 'justifyCenter',
+    icon: `<svg  width="13" height="10" viewBox="0 0 13 10" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" d="M10.875 8.125V9.375H2.125V8.125H10.875ZM12.75 5.625V6.875H0.25V5.625H12.75ZM10.875 3.125V4.375H2.125V3.125H10.875ZM12.75 0.625V1.875H0.25V0.625H12.75Z" fill="currentColor"></path>
+</svg>`,
+    attributes: { title: 'center' },
+    result: rte => rte.exec('justifyCenter'),
+  },
+  justifyRight: {
+    name: 'justifyRight',
+    icon: `<svg  width="13" height="10" viewBox="0 0 13 10" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" d="M12.75 8.125V9.375H4V8.125H12.75ZM12.75 5.625V6.875H0.25V5.625H12.75ZM12.75 3.125V4.375H4V3.125H12.75ZM12.75 0.625V1.875H0.25V0.625H12.75Z" fill="currentColor"></path>
+</svg>`,
+    attributes: { title: 'right' },
+    result: rte => rte.exec('justifyRight'),
+  },
   bold: {
     name: 'bold',
     icon: '<b>B</b>',
@@ -80,7 +240,7 @@ const defActions: Record<string, RichTextEditorAction> = {
     result: rte => rte.exec('strikeThrough'),
   },
   link: {
-    icon: `<svg viewBox="0 0 24 24">
+    icon: `<svg viewBox="0 0 24 24" width="18" height="24" >
           <path fill="currentColor" d="M3.9,12C3.9,10.29 5.29,8.9 7,8.9H11V7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H11V15.1H7C5.29,15.1 3.9,13.71 3.9,12M8,13H16V11H8V13M17,7H13V8.9H17C18.71,8.9 20.1,10.29 20.1,12C20.1,13.71 18.71,15.1 17,15.1H13V17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7Z" />
         </svg>`,
     name: 'link',
@@ -344,7 +504,7 @@ export default class RichTextEditor {
           if (btn) {
             (btn as any)[`on${event}`] = () => {
               action.result(this, action);
-              this.updateActiveActions();
+              //this.updateActiveActions();
             };
           }
         }
@@ -433,6 +593,9 @@ export default class RichTextEditor {
       const model = getComponentModel(el) || em.getSelected();
       const node = doc.createElement('div');
       const range = sel.getRangeAt(0);
+
+      const clonedContent = range.cloneContents();
+
       range.deleteContents();
 
       if (isString(value)) {

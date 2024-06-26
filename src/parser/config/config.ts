@@ -112,7 +112,7 @@ const config: ParserConfig = {
   parserHtml: undefined,
   optionsHtml: {
     htmlType: 'text/html',
-    allowScripts: false,
+    allowScripts: true,
     allowUnsafeAttr: false,
     allowUnsafeAttrValue: false,
     keepEmptyTextNodes: false,

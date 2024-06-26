@@ -52,6 +52,7 @@ import TraitView from './view/TraitView';
 import TraitsView from './view/TraitsView';
 import Category, { getItemsByCategory } from '../abstract/ModuleCategory';
 import Trait from './model/Trait';
+import TraitClickActionView from './view/TraitClickActionView';
 
 export default class TraitManager extends Module<TraitManagerConfigModule> {
   __ctn?: HTMLElement;
@@ -67,6 +68,7 @@ export default class TraitManager extends Module<TraitManagerConfigModule> {
     checkbox: TraitCheckboxView,
     color: TraitColorView,
     button: TraitButtonView,
+    action: TraitClickActionView,
   };
 
   /**

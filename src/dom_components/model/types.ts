@@ -18,12 +18,12 @@ export type DraggableDroppableFn = (source: Component, target: Component, index?
 
 export interface AddComponentsOption extends AddOptions, OptionAsDocument {}
 
-interface ComponentWithCheck<C extends Component>{
+interface ComponentWithCheck<C extends Component> {
   new (props: any, opt: ComponentOptions): C;
-  isComponent(node: HTMLElement, opts?: ParseNodeOptions): ComponentDefinitionDefined|undefined|boolean;
+  isComponent(node: HTMLElement, opts?: ParseNodeOptions): ComponentDefinitionDefined | undefined | boolean;
 }
 
-export interface ComponentStackItem<C extends Component = Component, CV extends ComponentView<C> = ComponentView<C>>{
+export interface ComponentStackItem<C extends Component = Component, CV extends ComponentView<C> = ComponentView<C>> {
   id: string;
   model: ComponentWithCheck<C>;
   view: new (opt: any) => CV;
@@ -139,6 +139,11 @@ export interface ComponentProperties {
    * @default true
    */
   copyable?: boolean;
+  /**
+   * True if it's possible to clone the component. Default: `false`
+   * @default false
+   */
+  linkable?: boolean;
   /**
    * Indicates if it's possible to resize the component. It's also possible to pass an object as [options for the Resizer](https://github.com/GrapesJS/grapesjs/blob/master/src/utils/Resizer.ts). Default: `false`
    */

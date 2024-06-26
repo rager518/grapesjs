@@ -68,17 +68,19 @@ export default class AssetsView extends View {
       return;
     }
 
-    input.value = '';
-    const assetsEl = this.getAssetsEl();
+    if (url.toLowerCase().startsWith('http://') || url.toLowerCase().startsWith('https://')) {
+      input.value = '';
+      const assetsEl = this.getAssetsEl();
 
-    if (assetsEl) {
-      assetsEl.scrollTop = 0;
-    }
+      if (assetsEl) {
+        assetsEl.scrollTop = 0;
+      }
 
-    if (handleAdd) {
-      handleAdd.bind(this)(url);
-    } else {
-      this.options.globalCollection.add(url, { at: 0 });
+      if (handleAdd) {
+        handleAdd.bind(this)(url);
+      } else {
+        this.options.globalCollection.add(url, { at: 0 });
+      }
     }
   }
 

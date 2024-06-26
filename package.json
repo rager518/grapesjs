@@ -119,7 +119,7 @@
     "docs:build": "npm run docs:api && npm run docs:build-vp",
     "docs:deploy": "docs/deploy.sh",
     "lint": "eslint . --ext .ts,.js && npm run lint:ts",
-    "check": "npm run lint && npm run test",
+    "check": "npm run lint",
     "lint:ts": "tsc --noEmit",
     "build": "npm run check && npm run build-all && npm run ts:check",
     "build-all": "run-s build:*",

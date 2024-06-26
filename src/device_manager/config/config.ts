@@ -48,7 +48,7 @@ const config: DeviceManagerConfig = {
     {
       id: 'mobilePortrait',
       name: 'Mobile portrait',
-      width: '320px',
+      width: '430px',
       widthMedia: '480px',
     },
   ],

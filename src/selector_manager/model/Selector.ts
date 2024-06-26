@@ -29,7 +29,7 @@ export default class Selector extends Model<SelectorProps & { [key: string]: unk
       name: '',
       label: '',
       type: TYPE_CLASS,
-      active: true,
+      active: false,
       private: false,
       protected: false,
       _undo: true,

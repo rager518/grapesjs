@@ -51,6 +51,7 @@ const commandsDef = [
   ['resize', 'Resize', 'resize'],
   ['fullscreen', 'Fullscreen', 'fullscreen'],
   ['copy', 'CopyComponent'],
+  ['link', 'LinkComponent'],
   ['paste', 'PasteComponent'],
   ['canvas-move', 'CanvasMove'],
   ['canvas-clear', 'CanvasClear'],
@@ -130,6 +131,12 @@ export default class CommandsModule extends Module<CommandsConfig & { pStylePref
       run(ed) {
         ed.runCommand('core:copy');
         ed.runCommand('core:paste', { action: 'clone-component' });
+      },
+    };
+
+    defaultCommands['tlb-link'] = {
+      run(ed) {
+        ed.runCommand('core:link');
       },
     };
 

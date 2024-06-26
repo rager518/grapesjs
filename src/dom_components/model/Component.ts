@@ -105,6 +105,7 @@ export const keyUpdateInside = ComponentsEvents.updateInside;
  * @property {Array<String>} [unstylable=[]] Indicate an array of style properties which should be hidden from the style manager. Default: `[]`
  * @property {Boolean} [highlightable=true] It can be highlighted with 'dotted' borders if true. Default: `true`
  * @property {Boolean} [copyable=true] True if it's possible to clone the component. Default: `true`
+ * @property {Boolean} [linkable=false] True if it's possible to clone the component. Default: `true`
  * @property {Boolean} [resizable=false] Indicates if it's possible to resize the component. It's also possible to pass an object as [options for the Resizer](https://github.com/GrapesJS/grapesjs/blob/master/src/utils/Resizer.ts). Default: `false`
  * @property {Boolean} [editable=false] Allow to edit the content of the component (used on Text components). Default: `false`
  * @property {Boolean} [layerable=true] Set to `false` if you need to hide the component inside Layers. Default: `true`
@@ -150,6 +151,7 @@ export default class Component extends StyleableModel<ComponentProperties> {
       unstylable: '',
       highlightable: true,
       copyable: true,
+      linkable: false,
       resizable: false,
       editable: false,
       layerable: true,
@@ -167,7 +169,22 @@ export default class Component extends StyleableModel<ComponentProperties> {
       'script-props': '',
       'script-export': '',
       attributes: {},
-      traits: ['id', 'title'],
+      traits: [
+        'id',
+        'title',
+        {
+          type: 'checkbox',
+          name: 'notpc',
+        },
+        {
+          type: 'checkbox',
+          name: 'nottablet',
+        },
+        {
+          type: 'checkbox',
+          name: 'notmobile',
+        },
+      ],
       propagate: '',
       dmode: '',
       toolbar: null,
@@ -1067,6 +1084,11 @@ export default class Component extends StyleableModel<ComponentProperties> {
         tb.push({
           label: em.getIcon('copy'),
           command: 'tlb-clone',
+        });
+      model.get('linkable') &&
+        tb.push({
+          label: em.getIcon('link'),
+          command: 'tlb-link',
         });
       model.get('removable') &&
         tb.push({

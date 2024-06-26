@@ -10,6 +10,8 @@ export default class ComponentText extends Component {
       type: 'text',
       droppable: false,
       editable: true,
+      attributes: { class: 'defaultFontStyle' },
+      styles: '.defaultFontStyle { font-size:18px;line-height:100%;color:inherit;letter-spacing:0px; }',
     };
   }
 
