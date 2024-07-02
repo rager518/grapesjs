@@ -121,7 +121,17 @@ export default class ComponentTextView<TComp extends ComponentText = ComponentTe
         em.logError(err as any);
       }
 
-      if (editable && (await this.getContent()) !== this.lastContent) {
+      // for tinymce
+      let cont = await this.getContent();
+      let isSame: boolean = false;
+      if (
+        cont === this.lastContent ||
+        cont === `<p>${this.lastContent?.trim().replaceAll('\n', '').replaceAll('           ', '')}</p>`
+      ) {
+        isSame = true;
+      }
+
+      if (editable && !isSame) {
         await this.syncContent(opts);
         this.lastContent = '';
       }
