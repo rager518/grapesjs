@@ -54,6 +54,35 @@ const isValidTag = (rte: RichTextEditor, tagName = 'A') => {
   return parentAnchor?.nodeName == tagName || parentFocus?.nodeName == tagName;
 };
 
+const findSelection = (rte: RichTextEditor): HTMLElement | null => {
+  const { anchorNode, focusNode } = rte.selection() || {};
+  const parentAnchor = anchorNode?.parentNode as HTMLElement | null;
+  const parentFocus = focusNode?.parentNode as HTMLElement | null;
+
+  const tagMapping = {
+    SPAN: HTMLSpanElement,
+    H1: HTMLHeadElement,
+    H2: HTMLHeadElement,
+    H3: HTMLHeadElement,
+    P: HTMLParagraphElement,
+    DIV: HTMLDivElement,
+  };
+
+  let element: HTMLElement | null = null;
+
+  // Function to find the target element based on the tag mapping
+  const findElement = (parent: HTMLElement | null) => {
+    if (parent && parent.nodeName in tagMapping) {
+      return parent;
+    }
+    return null;
+  };
+
+  element = findElement(parentAnchor) || findElement(parentFocus);
+
+  return element;
+};
+
 const customElAttr = 'data-selectme';
 
 const rgbToHex = (colorString: string): string | null => {
@@ -74,38 +103,26 @@ const rgbToHex = (colorString: string): string | null => {
 };
 
 const getSelectHtml = (rte: RichTextEditor, fontSize: string, color: string, type: number = 0): string => {
-  let tagName = 'SPAN';
-  if (isValidTag(rte, tagName)) {
-    const { anchorNode, focusNode } = rte.selection() || {};
-    const parentAnchor = anchorNode?.parentNode;
-    const parentFocus = focusNode?.parentNode;
+  let element = findSelection(rte);
 
-    let span: HTMLSpanElement | null = null;
+  if (element) {
+    const computedStyle = window.getComputedStyle(element);
 
-    if (parentAnchor?.nodeName == tagName) {
-      span = parentAnchor as HTMLSpanElement;
-    } else if (parentFocus?.nodeName == tagName) {
-      span == (parentFocus as HTMLSpanElement);
-    }
-
-    if (span) {
-      const computedStyle = window.getComputedStyle(span);
-      switch (type) {
-        case 1:
-          fontSize = computedStyle.fontSize;
-          break;
-        case 0:
-          color = computedStyle.color;
-          break;
-      }
+    switch (type) {
+      case 1:
+        fontSize = computedStyle.fontSize;
+        break;
+      case 0:
+        color = computedStyle.color;
+        break;
     }
   }
 
   return `<span style="color:${color}; font-size:${fontSize};">${rte.selection()} </span>`;
 };
 
-const patchAction = (rte: RichTextEditor, size: string, color: string, select: boolean) => {
-  const html = getSelectHtml(rte, size + 'px', color, 0);
+const patchAction = (rte: RichTextEditor, size: string, color: string, select: boolean, type: number) => {
+  const html = getSelectHtml(rte, size + 'px', color, type);
 
   rte.insertHTML(html, {
     select: select,
@@ -115,28 +132,15 @@ const patchAction = (rte: RichTextEditor, size: string, color: string, select: b
 const syncStyle = (rte: RichTextEditor, action: RichTextEditorAction, type: number = 0): number => {
   if (rte && rte.selection()) {
     if (action.btn?.firstChild != null && action.btn?.firstChild instanceof HTMLInputElement) {
-      let tagName = 'SPAN';
       let fontSize = DEFAULT_FONT_SIZE;
       let color: string | null = DEFAULT_COLOR;
 
-      if (isValidTag(rte, tagName)) {
-        const { anchorNode, focusNode } = rte.selection() || {};
-        const parentAnchor = anchorNode?.parentNode;
-        const parentFocus = focusNode?.parentNode;
+      let element = findSelection(rte);
 
-        let span: HTMLSpanElement | null = null;
-
-        if (parentAnchor?.nodeName == tagName) {
-          span = parentAnchor as HTMLSpanElement;
-        } else if (parentFocus?.nodeName == tagName) {
-          span == (parentFocus as HTMLSpanElement);
-        }
-
-        if (span) {
-          const computedStyle = window.getComputedStyle(span);
-          fontSize = computedStyle.fontSize.replace('px', '');
-          color = rgbToHex(computedStyle.color);
-        }
+      if (element) {
+        const computedStyle = window.getComputedStyle(element);
+        fontSize = computedStyle.fontSize.replace('px', '');
+        color = rgbToHex(computedStyle.color);
       }
 
       let val = type === 0 ? fontSize : color;
@@ -164,7 +168,7 @@ const defActions: Record<string, RichTextEditorAction> = {
           color = faction.btn.firstChild.value;
         }
 
-        patchAction(rte, action.btn.firstChild.value, color ?? DEFAULT_COLOR, false);
+        patchAction(rte, action.btn.firstChild.value, color ?? DEFAULT_COLOR, false, 0);
       }
     },
     update: (rte, action) => {
@@ -184,7 +188,7 @@ const defActions: Record<string, RichTextEditorAction> = {
           fsize = faction.btn.firstChild.value;
         }
 
-        patchAction(rte, fsize, action.btn.firstChild.value, false);
+        patchAction(rte, fsize, action.btn.firstChild.value, false, 1);
       }
     },
     update: (rte, action) => {
