@@ -1282,7 +1282,7 @@ export default class Sorter extends View {
       } else {
         // @ts-ignore
         modelToDrop = isFunction(dropContent) ? dropContent() : dropContent;
-        opts.avoidUpdateStyle = true;
+        opts.avoidUpdateStyle = false;
         opts.action = 'add-component';
       }
 

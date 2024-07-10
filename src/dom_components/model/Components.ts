@@ -206,6 +206,52 @@ Component> {
 
       const inner = removed.components();
       inner.forEach(it => this.removeChildren(it, coll, opts));
+
+      // Remove redundant classed
+      const getClassCounts = (): { [key: string]: number } => {
+        const classCounts: { [key: string]: number } = {};
+        const allElements: NodeListOf<Element> | undefined = em
+          .getCurrentFrame()
+          ?.getWindow()
+          .document.querySelectorAll('*');
+
+        if (allElements) {
+          allElements.forEach((element: Element) => {
+            const classList: string[] = (element.className as string).split(/\s+/);
+            classList.forEach((className: string) => {
+              if (className && !className.startsWith('gjs-')) {
+                if (classCounts[className]) {
+                  classCounts[className]++;
+                } else {
+                  classCounts[className] = 1;
+                }
+              }
+            });
+          });
+        }
+
+        return classCounts;
+      };
+
+      const isUsing = (classCounts: { [key: string]: number }, ruleName: string): boolean => {
+        return classCounts[ruleName] !== undefined && classCounts[ruleName] > 1;
+      };
+
+      const classCounts = getClassCounts();
+
+      rules.forEach(rule => {
+        if (rule) {
+          const removedClasses = removed.getClasses();
+          const gid = rule.selectorsToString();
+
+          if (gid.charAt(0) === '.' && removedClasses.includes(gid.slice(1))) {
+            if (!isUsing(classCounts, gid.slice(1))) {
+              rules.remove(rule);
+              sels.remove(rule.getSelectors().at(0));
+            }
+          }
+        }
+      });
     }
 
     // Remove stuff registered in DomComponents.handleChanges
